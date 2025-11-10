@@ -175,7 +175,42 @@ export class Board {
                 assert(ctrl === null || (typeof ctrl === 'string' && this.players.has(ctrl)));
             }
         }
-    }     
+    }
+
+    // Check all player ids are nonempty strings with no whitespace
+    for (const playerId of this.players.keys()) {
+        assert(typeof playerId === 'string' && playerId.length > 0);
+        assert(!/\s/.test(playerId));
+    }
+
+    // Check waitingForControl keys are valid "row,col" format
+    for (const key of this.waitingForControl.keys()) {
+        const parts = key.split(',');
+        assert(parts.length === 2);
+        const row = Number(parts[0]);
+        const col = Number(parts[1]);
+        assert(Number.isInteger(row) && row >= 0 && row < this.rows);
+        assert(Number.isInteger(col) && col >= 0 && col < this.cols);
+    }
+
+    // Check lingering maps player ids to valid position arrays
+    for (const [playerId, positions] of this.lingering.entries()) {
+        assert(this.players.has(playerId));
+        assert(Array.isArray(positions));
+        for (const pos of positions) {
+            assert(Number.isInteger(pos.row) && pos.row >= 0 && pos.row < this.rows);
+            assert(Number.isInteger(pos.col) && pos.col >= 0 && pos.col < this.cols);
+        }
+    }
+
+    // Check changeResolvers maps player ids to function arrays
+    for (const [playerId, resolvers] of this.changeResolvers.entries()) {
+        assert(this.players.has(playerId));
+        assert(Array.isArray(resolvers));
+        for (const resolver of resolvers) {
+            assert(typeof resolver === 'function');
+        }
+    }
 }
 
     /**
